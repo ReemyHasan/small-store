@@ -19,7 +19,7 @@ class Product extends Model
         "category",
         "user"
     ];
-    protected $appends = array("created_from");
+    protected $appends = array("created_from","image_url");
     public function category(){
         return $this->belongsTo(Category::class,"category_id");
     }
@@ -32,7 +32,7 @@ class Product extends Model
     public static function getRecord($id){
         return self::where("id",$id)->first();
     }
-    public function get_imageUrl()
+    public function getImageUrlAttribute()
     {
         if ($this->image) {
             return url('storage/' . $this->image);
