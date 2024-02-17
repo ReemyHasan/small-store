@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\UserRequest;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -42,7 +43,7 @@ class UserController extends Controller
         }
     }
 
-    public function update(UserRequest $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
         $user = $this->userService->getById($id);
         if ($user != null) {
