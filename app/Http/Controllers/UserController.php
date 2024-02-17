@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\UserRequest;
 use App\Services\UserService;
-use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -23,13 +22,10 @@ class UserController extends Controller
 
     public function store(UserRequest $request)
     {
-        $validated = $request->validated();
-        $user = $this->userService->create($validated);
-        if ($user) {
-        return response()->json(["user"=> $user, "message"=>"user added successfully"],201);
-        } else {
-            return response()->json(["user"=> null,"message"=> "error"],0);
-        }
+            $validated = $request->validated();
+            if ($user = $this->userService->create($validated)) {
+            return response()->json(["user"=> $user, "message"=>"user added successfully"],201);
+            }
     }
 
     public function show($id)
