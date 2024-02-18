@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
@@ -17,11 +18,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+Route::group(["middleware" => "auth:api"], function () {
+    Route::resource('v1/users', UserController::class)->except('create', 'edit');
+    Route::resource('v1/products', ProductController::class)->except('create', 'edit');
+    Route::resource('v1/categories', CategoryController::class)->except('create', 'edit');
+    Route::post('v1/logout', [AuthController::class, 'logout']);
+    Route::post('v1/refresh', [AuthController::class, 'refresh']);
+
 });
 
-Route::resource('v1/users',UserController::class)->except('create','edit');
-Route::resource('v1/products',ProductController::class)->except('create','edit');
-Route::resource('v1/categories',CategoryController::class)->except('create','edit');
-
+Route::post('v1/login', [AuthController::class, 'login']);
