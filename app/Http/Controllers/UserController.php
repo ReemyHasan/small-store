@@ -17,15 +17,21 @@ class UserController extends Controller
     public function index()
     {
         $users = $this->userService->getAll();
-        return response()->json($users);
+        if ($users) {
+            return response()->json([
+                "message" => "all users",
+                "users" => $users
+            ], 200);
+        }
     }
 
     public function store(UserRequest $request)
     {
-            $validated = $request->validated();
-            if ($user = $this->userService->create($validated)) {
-            return response()->json(["user"=> $user, "message"=>"user added successfully"],201);
-            }
+        $validated = $request->validated();
+        $user = $this->userService->create($validated);
+        if ($user) {
+            return response()->json(["user" => $user, "message" => "user added successfully"], 201);
+        }
     }
 
     public function show($id)

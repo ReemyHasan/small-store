@@ -16,14 +16,25 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = $this->categoryService->getAll();
-        return response()->json($categories);
+        if ($categories)
+            return response()->json([
+                "message" => "all categories",
+                "categories" => $categories
+            ], 200);
     }
 
     public function store(CategoryRequest $request)
     {
         $validated = $request->validated();
         $category = $this->categoryService->create($validated);
-        return response()->json(["category" => $category, "message" => "category added successfully"], 201);
+        if ($category)
+            return response()->json(
+                [
+                    "category" => $category,
+                    "message" => "category added successfully"
+                ],
+                201
+            );
     }
 
     public function show($id)

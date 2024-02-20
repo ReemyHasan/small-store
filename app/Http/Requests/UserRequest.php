@@ -26,7 +26,8 @@ class UserRequest extends FormRequest
         return [
             "email" => "required|email|unique:users|max:255",
             "name" => "required|max:25|min:5",
-            "password" => "required|confirmed",
+            "password" => "required|confirmed|min:6|max:30
+            |regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!@$#%]).*$/",
             "role" => "required|max:10"
         ];
     }

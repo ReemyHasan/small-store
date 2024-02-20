@@ -16,7 +16,11 @@ class ProductController extends Controller
     public function index()
     {
         $products = $this->productService->getAll();
-        return response()->json($products);
+        if ($products)
+            return response()->json([
+                "message" => "all products",
+                "products" => $products
+            ], 200);
 
     }
 
@@ -27,7 +31,8 @@ class ProductController extends Controller
             $validated['image'] = $this->productService->handleUploadedImage($request->file('image'), null);
         }
         $product = $this->productService->create($validated);
-        return response()->json(["product" => $product, "message" => "product added successfully"], 201);
+        if ($product)
+            return response()->json(["product" => $product, "message" => "product added successfully"], 201);
     }
 
     public function show($id)
