@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
@@ -31,5 +30,16 @@ class UserService
     {
         return $user->delete();
     }
-
+    public function handleUploadedImage($image, $user)
+    {
+        return HandleUploadedImage($image,$user,'users');
+    }
+    public function saveImage($image, $user)
+    {
+        return $user->image()->create(
+            [
+                'url' => $image,
+            ]
+        );
+    }
 }

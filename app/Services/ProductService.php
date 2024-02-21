@@ -2,10 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
@@ -32,16 +30,27 @@ class ProductService
     }
     public function handleUploadedImage($image, $product)
     {
-        if (!is_null($image)) {
-            $image = $image->store('products', 'public');
-            if(!is_null($product)) {
-            Storage::disk('public')->delete($product->image ?? '');
-            }
-            return $image;
-        }
+        return HandleUploadedImage($image,$product,'products');
     }
-    public function getMyProduct(){
-        $products = Product::getRecords()->where('vendor_id','=',Auth::user()->id)->get();
+
+    public function handleUploadedImages($images, $product)
+    {
+        $productImages = [];
+        foreach ($images as $key => $value) {
+            $productImage = $this->handleUploadedImage($value, $product);
+            if ($productImage !== null)
+                $productImages[] = ['url' => $productImage];
+        }
+        return $productImages;
+    }
+    public function getMyProduct()
+    {
+        $products = Product::getRecords()->where('vendor_id', '=', Auth::user()->id)->get();
         return $products;
+    }
+    public function saveImages($images, $product)
+    {
+        $productImages = $product->images()->createMany($images);
+        return $productImages;
     }
 }

@@ -3,27 +3,32 @@
 namespace App\Models;
 
 use App\Traits\CreatedFrom;
+use App\Traits\ImageAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
-class Category extends Model
+class Category extends BaseModel
 {
-    use HasFactory, CreatedFrom;
+    use HasFactory, CreatedFrom,ImageAttribute;
     protected $guarded = [
         "id",
         "created_at",
         "updated_at",
     ];
-    protected $appends = array("created_from");
+    protected $with = [
+        "products"
+    ];
+    protected $appends = array("created_from", "image_url");
     public function user(){
         return $this->belongsTo(User::class,'created_by');
     }
-    static public function getRecords()
-    {
-        return self::orderBy("created_at","desc")->get();
+    public function products(){
+        return $this->hasMany(Product::class,'category_id')->filter();
     }
-    static public function getRecord($id)
+
+    public function image(): MorphOne
     {
-        return self::where("id","=", $id)->first();
+        return $this->morphOne(Image::class, 'imageable');
     }
+
 }

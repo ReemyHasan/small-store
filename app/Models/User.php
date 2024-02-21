@@ -4,15 +4,27 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Traits\CreatedFrom;
+use App\Traits\ImageAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Foundation\Auth\Access\Authorizable;
 
-class User extends Authenticatable
+class User extends BaseModel implements
+    AuthenticatableContract,
+    AuthorizableContract,
+    CanResetPasswordContract
 {
-    use HasApiTokens, HasFactory, Notifiable, CreatedFrom, SoftDeletes;
+    use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail;
+
+    use HasApiTokens, HasFactory, Notifiable, CreatedFrom,ImageAttribute;
 
     /**
      * The attributes that are mass assignable.
@@ -33,7 +45,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-    protected $appends = array("created_from");
+    protected $appends = array("created_from",'image_url');
     /**
      * The attributes that should be cast.
      *
@@ -43,12 +55,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-    static public function getRecords()
+    public function image(): MorphOne
     {
-        return self::orderBy("created_at","desc")->get();
+        return $this->morphOne(Image::class, 'imageable');
     }
-    static public function getRecord($id)
-    {
-        return self::where("id","=", $id)->first();
-    }
+
 }

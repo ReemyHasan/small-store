@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
 use App\Services\CategoryService;
-use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -25,9 +25,19 @@ class CategoryController extends Controller
 
     public function store(CategoryRequest $request)
     {
-        $validated = $request->validated();
-        $category = $this->categoryService->create($validated);
-        if ($category)
+        $request->validated();
+        $category = $this->categoryService->create($request->except('image'));
+        if ($category) {
+            if ($request->hasFile('image')) {
+                if ($image = $this->categoryService->handleUploadedImage($request->file('image'), $category)) {
+                    $categoryImage = $this->categoryService->saveImage($image, $category);
+                    if ($categoryImage)
+                        return response()->json(["category" => $category, "message" => "category added successfully"], 201);
+                    else {
+                        return response()->json(["category" => $category, "message" => "image not saved"]);
+                    }
+                }
+            }
             return response()->json(
                 [
                     "category" => $category,
@@ -35,6 +45,9 @@ class CategoryController extends Controller
                 ],
                 201
             );
+        }
+        return response()->json(["message" => "category not saved"]);
+
     }
 
     public function show($id)
@@ -47,12 +60,26 @@ class CategoryController extends Controller
         }
     }
 
-    public function update(CategoryRequest $request, $id)
+    public function update(UpdateCategoryRequest $request, $id)
     {
         $category = $this->categoryService->getById($id);
         if ($category != null) {
-            $validated = $request->validated();
-            $this->categoryService->update($category, $validated);
+            $request->validated();
+            $this->categoryService->update($category, $request->except('image'));
+            if ($request->hasFile('image')) {
+                if ($image = $this->categoryService->handleUploadedImage($request->file('image'), $category)) {
+                    $categoryImage = $category->image()->update(
+                        [
+                            'url' => $image,
+                        ]
+                    );
+                    if ($categoryImage)
+                        return response()->json(["category" => $category, "message" => "category updated successfully"], 202);
+                    else {
+                        return response()->json(["category" => $category, "message" => "image not saved"]);
+                    }
+                }
+            }
             return response()->json(["message" => "category updated successfully"], 202);
         } else {
             return response()->json(["message" => "category not found"], 404);
@@ -63,8 +90,10 @@ class CategoryController extends Controller
     {
         $category = $this->categoryService->getById($id);
         if ($category != null) {
-            $this->categoryService->delete($category);
-            return response()->json(["message" => "category deleted successfully"], 202);
+            $category->image()->delete();
+            if ($this->categoryService->delete($category)) {
+                return response()->json(["message" => "category deleted successfully"], 202);
+            }
         } else {
             return response()->json(["message" => "category not found"], 404);
         }

@@ -25,10 +25,9 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "email"=> "email",
+            "email" => "email",
             "name" => "max:25|min:5",
-            "password"=> "confirmed",
-            "role"=>"max:10"
+            'image' => 'mimes:png,jpg,gif|max:2765|dimensions:width<=3840,height<=2160',
         ];
     }
     public function failedValidation(Validator $validator)

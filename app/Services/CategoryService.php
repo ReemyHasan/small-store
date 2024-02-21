@@ -20,4 +20,16 @@ class CategoryService
     public function delete($category){
         return $category->delete();
     }
+    public function handleUploadedImage($image, $category)
+    {
+        return HandleUploadedImage($image,$category,'categories');
+    }
+    public function saveImage($image, $category)
+    {
+        return $category->image()->create(
+            [
+                'url' => $image,
+            ]
+        );
+    }
 }

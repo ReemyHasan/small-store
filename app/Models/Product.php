@@ -3,20 +3,17 @@
 namespace App\Models;
 
 use App\Traits\CreatedFrom;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-class Product extends Model
+class Product extends BaseModel
 {
     use HasFactory, CreatedFrom;
     protected $guarded = [
         "id",
         "created_at",
         "updated_at",
-    ];
-    protected $with = [
-        "category",
-        "user"
     ];
     protected $appends = array("created_from", "image_url");
     public function category()
@@ -27,18 +24,33 @@ class Product extends Model
     {
         return $this->belongsTo(User::class, "vendor_id");
     }
-    public static function getRecords()
-    {
-        return self::orderBy("created_at", "desc")->get();
-    }
-    public static function getRecord($id)
-    {
-        return self::where("id", $id)->first();
-    }
     public function getImageUrlAttribute()
     {
-        if ($this->image) {
-            return url('storage/' . $this->image);
+        if ($this->images) {
+            $urls =[];
+            foreach($this->images as $image){
+                array_push($urls,url('storage/' .$image->url));
+            }
+            return $urls;
         }
+    }
+
+    public function images(): MorphMany
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('price', function (Builder $builder) {
+            $builder->where('price', '>', 150);
+        });
+    }
+
+    public function scopeFilter($query){
+        return $query->with(['user' => function ($query) {
+            $query->where('name', 'like', '%a%');
+        }]);
     }
 }

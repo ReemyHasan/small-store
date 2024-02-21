@@ -28,17 +28,30 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         $validated = $request->validated();
-        $user = $this->userService->create($validated);
+        $user = $this->userService->create($request->except('image', 'password_confirmation'));
         if ($user) {
+            if ($request->hasFile('image')) {
+                if ($image = $this->userService->handleUploadedImage($request->file('image'), $user)) {
+                    $userImage = $this->userService->saveImage($image, $user);
+                    $user->image;
+                    if ($userImage)
+                        return response()->json(["user" => $user, "message" => "user added successfully"], 201);
+                    else {
+                        return response()->json(["user" => $user, "message" => "image not saved"]);
+                    }
+                }
+            }
             return response()->json(["user" => $user, "message" => "user added successfully"], 201);
         }
+        return response()->json(["message" => "user not saved"]);
+
     }
 
     public function show($id)
     {
         $user = $this->userService->getById($id);
         if ($user != null) {
-            return response()->json($user);
+            return response()->json(['user' => $user]);
 
         } else {
             return response()->json(["message" => "user not found"], 404);
@@ -49,8 +62,22 @@ class UserController extends Controller
     {
         $user = $this->userService->getById($id);
         if ($user != null) {
-            $validated = $request->validated();
-            $this->userService->update($user, $validated);
+            $request->validated();
+            $this->userService->update($user, $request->except('image','password_confirmation'));
+            if ($request->hasFile('image')) {
+                if ($image = $this->userService->handleUploadedImage($request->file('image'), $user)) {
+                    $userImage = $user->image()->update(
+                        [
+                            'url' => $image,
+                        ]
+                    );
+                    if ($userImage)
+                        return response()->json(["user" => $user, "message" => "user updated successfully"], 202);
+                    else {
+                        return response()->json(["user" => $user, "message" => "image not saved"]);
+                    }
+                }
+            }
             return response()->json(["message" => "user updated successfully"], 202);
         } else {
             return response()->json(["message" => "user not found"], 404);
@@ -61,8 +88,9 @@ class UserController extends Controller
     {
         $user = $this->userService->getById($id);
         if ($user != null) {
-            $this->userService->delete($user);
-            return response()->json(["message" => "user deleted successfully"], 202);
+            $user->image()->delete();
+            if ($this->userService->delete($user))
+                return response()->json(["message" => "user deleted successfully"], 202);
         } else {
             return response()->json(["message" => "user not found"], 404);
         }
