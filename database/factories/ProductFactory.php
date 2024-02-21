@@ -24,8 +24,8 @@ class ProductFactory extends Factory
             'name' => fake()->text('15'),
             'description'=> fake()->slug(),
             'status'=> rand(0,1),
-            'count'=> rand(0,300),
-            // 'image' => fake()->image('storage/app/public/products',400,300, null, false),
+            'quantity'=> rand(0,300),
+            'price'=> fake()->randomFloat(1,120,130),
             'vendor_id' => fake()->randomElement($users),
             'category_id' => fake()->randomElement($categories),
         ];
