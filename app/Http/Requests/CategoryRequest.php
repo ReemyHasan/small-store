@@ -27,7 +27,7 @@ class CategoryRequest extends FormRequest
             "name" => "required|max:25|min:5",
             "description" => "required|max:255|min:5",
             "created_by"=> "required",
-            'image' => 'mimes:png,jpg,gif|max:2765|dimensions:width<=3840,height<=2160',
+            'image' => 'mimes:png,jpg,gif|max:2765|dimensions:width=3840,height=2160',
         ];
     }
     public function failedValidation(Validator $validator)

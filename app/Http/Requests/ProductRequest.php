@@ -30,7 +30,7 @@ class ProductRequest extends FormRequest
             "category_id" => "required",
             "vendor_id"=> "required",
             "quantity"=> "integer",
-            'images.*' => 'mimes:png,jpg,gif|max:2765|dimensions:width<=3840,height<=2160',
+            'images.*' => 'mimes:png,jpg,gif|max:2765|dimensions:width=3840,height=2160',
         ];
     }
     public function failedValidation(Validator $validator)

@@ -29,7 +29,7 @@ class UpdateProductRequest extends FormRequest
             "status" => "max:3",
             "price" => "regex:/^[0-9]+(\.[0-9][0-9]?)?$/",
             "quantity"=> "integer",
-            'images.*' => 'mimes:png,jpg,gif|max:2765|dimensions:width<=3840,height<=2160',
+            'images.*' => 'mimes:png,jpg,gif|max:2765|dimensions:width=3840,height=2160',
         ];
     }
     public function failedValidation(Validator $validator)
