@@ -68,13 +68,9 @@ class CategoryController extends Controller
             $this->categoryService->update($category, $request->except('image'));
             if ($request->hasFile('image')) {
                 if ($image = $this->categoryService->handleUploadedImage($request->file('image'), $category)) {
-                    $categoryImage = $category->image()->update(
-                        [
-                            'url' => $image,
-                        ]
-                    );
+                    $categoryImage = $this->categoryService->updateImage($image, $category);
                     if ($categoryImage)
-                        return response()->json(["category" => $category, "message" => "category updated successfully"], 202);
+                        return response()->json(["category" => $category, "message" => "category updated with image successfully"], 202);
                     else {
                         return response()->json(["category" => $category, "message" => "image not saved"]);
                     }
@@ -90,8 +86,7 @@ class CategoryController extends Controller
     {
         $category = $this->categoryService->getById($id);
         if ($category != null) {
-            $category->image()->delete();
-            if ($this->categoryService->delete($category)) {
+            if ($this->categoryService->deleteImage($category) &&$this->categoryService->delete($category)) {
                 return response()->json(["message" => "category deleted successfully"], 202);
             }
         } else {

@@ -63,14 +63,10 @@ class UserController extends Controller
         $user = $this->userService->getById($id);
         if ($user != null) {
             $request->validated();
-            $this->userService->update($user, $request->except('image','password_confirmation'));
+            $this->userService->update($user, $request->except('image', 'password_confirmation'));
             if ($request->hasFile('image')) {
                 if ($image = $this->userService->handleUploadedImage($request->file('image'), $user)) {
-                    $userImage = $user->image()->update(
-                        [
-                            'url' => $image,
-                        ]
-                    );
+                    $userImage = $this->userService->updateImage($image, $user);
                     if ($userImage)
                         return response()->json(["user" => $user, "message" => "user updated successfully"], 202);
                     else {
@@ -88,8 +84,8 @@ class UserController extends Controller
     {
         $user = $this->userService->getById($id);
         if ($user != null) {
-            $user->image()->delete();
-            if ($this->userService->delete($user))
+
+            if ($this->userService->deleteImage($user) && $this->userService->delete($user))
                 return response()->json(["message" => "user deleted successfully"], 202);
         } else {
             return response()->json(["message" => "user not found"], 404);

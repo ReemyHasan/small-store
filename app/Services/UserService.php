@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Traits\CommonService;
 
 class UserService
 {
+    use CommonService;
     public function getAll()
     {
         $users = User::getRecords();
@@ -22,24 +24,8 @@ class UserService
     {
         return User::getRecord($id);
     }
-    public function update($user, $validated)
-    {
-        return $user->update($validated);
-    }
-    public function delete($user)
-    {
-        return $user->delete();
-    }
     public function handleUploadedImage($image, $user)
     {
-        return HandleUploadedImage($image,$user,'users');
-    }
-    public function saveImage($image, $user)
-    {
-        return $user->image()->create(
-            [
-                'url' => $image,
-            ]
-        );
+        return HandleUploadedImage($image, $user, 'users');
     }
 }
