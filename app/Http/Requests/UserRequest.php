@@ -29,7 +29,7 @@ class UserRequest extends FormRequest
             "password" => "required|confirmed|min:6|max:30
             |regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!@$#%]).*$/",
             "role" => "required|max:10",
-            'image' => 'mimes:png,jpg,gif|max:2765|dimensions:width=3840,height=2160',
+            'image' => 'required|image|mimes:png,jpg,gif|max:2765|dimensions:width=3840,height=2160',
         ];
     }
     public function failedValidation(Validator $validator)
