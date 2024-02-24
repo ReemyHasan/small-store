@@ -27,9 +27,9 @@ class Product extends BaseModel
     public function getImageUrlAttribute()
     {
         if ($this->images) {
-            $urls =[];
-            foreach($this->images as $image){
-                array_push($urls,url('storage/' .$image->url));
+            $urls = [];
+            foreach ($this->images as $image) {
+                array_push($urls, url('storage/' . $image->url));
             }
             return $urls;
         }
@@ -48,9 +48,12 @@ class Product extends BaseModel
         });
     }
 
-    public function scopeFilter($query){
-        return $query->with(['user' => function ($query) {
-            $query->where('name', 'like', '%a%');
+    public function scopeFilter($query)
+    {
+        return $query->whereHas('user', function ($query) {
+            $query->where('name', 'like', '%a%')->select('id', 'name');
+        })->with(['user' => function ($query) {
+            $query->select('id', 'name','created_at');
         }]);
     }
 }
