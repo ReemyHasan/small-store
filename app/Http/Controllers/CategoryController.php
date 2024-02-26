@@ -76,7 +76,7 @@ class CategoryController extends Controller
                     }
                 }
             }
-            return response()->json(["message" => "category updated successfully"], 202);
+            return response()->json(['category'=>$category,"message" => "category updated successfully"], 202);
         } else {
             return response()->json(["message" => "category not found"], 404);
         }

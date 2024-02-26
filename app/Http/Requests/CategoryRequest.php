@@ -2,7 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Validation\Validator as ResponseValidator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
@@ -28,10 +29,20 @@ class CategoryRequest extends FormRequest
             "description" => "required|max:255|min:5",
             "created_by"=> "required",
             'image' => 'required|image|mimes:png,jpg,gif|max:2765|dimensions:width<=3840,height<=2160',
-            'supercategory_id'=>'exists:categories,id',
+            'supercategory_id'=>[
+                function ($attribute, $value, $fail) {
+                    $validator = Validator::make([$attribute => $value], [
+                        $attribute => 'exists:categories,id',
+                    ]);
+
+                    if ($validator->fails() && $value != 0) {
+                        $fail('The selected supercategory is invalid.');
+                    }
+                },
+            ],
         ];
     }
-    public function failedValidation(Validator $validator)
+    public function failedValidation(ResponseValidator $validator)
     {
         throw new HttpResponseException(response()->json([
             'success' => false,

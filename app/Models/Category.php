@@ -17,7 +17,6 @@ class Category extends BaseModel
     ];
     protected $with = [
         "products",
-        "subcategories"
     ];
     protected $appends = array("created_from", "image_url");
     public function user(){
