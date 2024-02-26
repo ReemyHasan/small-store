@@ -10,7 +10,7 @@ class CategoryService
     use CommonService;
     public function getAll()
     {
-        $categories = Category::getRecords();
+        $categories = Category::where('supercategory_id', 0)->with('subcategories')->get();
         return $categories;
     }
     public function create($data)
