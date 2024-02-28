@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Category;
 
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Contracts\Validation\Validator as ResponseValidator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-
-class CategoryRequest extends FormRequest
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Validation\Validator as ResponseValidator;
+class UpdateCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +24,9 @@ class CategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => "required|max:25|min:5",
-            "description" => "required|max:255|min:5",
-            "created_by"=> "required",
-            'image' => 'required|image|mimes:png,jpg,gif|max:2765|dimensions:width<=3840,height<=2160',
+            "name" => "max:25|min:5",
+            "description" => "max:255|min:5",
+            'image' => 'image|mimes:png,jpg,gif|max:2765|dimensions:width<=3840,height<=2160',
             'supercategory_id'=>[
                 function ($attribute, $value, $fail) {
                     $validator = Validator::make([$attribute => $value], [
