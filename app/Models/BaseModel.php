@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class BaseModel extends Model
 {
+    protected $hidden = [
+        'image'
+    ];
     public static function getRecords()
     {
         return self::orderBy("created_at", "desc")->get();

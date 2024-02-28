@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Requests\Category\CategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Services\CategoryService;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -26,34 +27,25 @@ class CategoryController extends Controller
     public function store(CategoryRequest $request)
     {
         $request->validated();
-        $category = $this->categoryService->create($request->except('image'));
-        if ($category) {
-            if ($request->hasFile('image')) {
-                if ($image = $this->categoryService->handleUploadedImage($request->file('image'), $category)) {
-                    $categoryImage = $this->categoryService->saveImage($image, $category);
-                    if ($categoryImage)
-                        return response()->json(["category" => $category, "message" => "category added successfully"], 201);
-                    else {
-                        return response()->json(["category" => $category, "message" => "image not saved"]);
-                    }
+        return DB::transaction(function () use ($request) {
+            $category = $this->categoryService->create($request->except('image'));
+
+            if ($request->hasFile('image') && ($image = $this->categoryService->handleUploadedImage($request->file('image'), $category))) {
+                $categoryImage = $this->categoryService->saveImage($image, $category);
+
+                if (!$categoryImage) {
+                    return response()->json(["category" => $category, "message" => "Image not saved"]);
                 }
             }
-            return response()->json(
-                [
-                    "category" => $category,
-                    "message" => "category added successfully"
-                ],
-                201
-            );
-        }
-        return response()->json(["message" => "category not saved"]);
 
+            return response()->json(["category" => $category, "message" => "Category added successfully"], 201);
+        });
     }
 
     public function show($id)
     {
         $category = $this->categoryService->getById($id);
-        if ($category != null) {
+        if (!$category) {
             return response()->json($category);
         } else {
             return response()->json(["message" => "category not found"], 404);
@@ -63,34 +55,36 @@ class CategoryController extends Controller
     public function update(UpdateCategoryRequest $request, $id)
     {
         $category = $this->categoryService->getById($id);
-        if ($category != null) {
-            $request->validated();
-            $this->categoryService->update($category, $request->except('image'));
-            if ($request->hasFile('image')) {
-                if ($image = $this->categoryService->handleUploadedImage($request->file('image'), $category)) {
-                    $categoryImage = $this->categoryService->updateImage($image, $category);
-                    if ($categoryImage)
-                        return response()->json(["category" => $category, "message" => "category updated with image successfully"], 202);
-                    else {
-                        return response()->json(["category" => $category, "message" => "image not saved"]);
-                    }
-                }
-            }
-            return response()->json(["message" => "category updated successfully"], 202);
-        } else {
+        if (!$category) {
             return response()->json(["message" => "category not found"], 404);
         }
+        $request->validated();
+        return DB::transaction(function () use ($request, $category) {
+            $this->categoryService->update($category, $request->except('image'));
+
+            if ($request->hasFile('image') && ($image = $this->categoryService->handleUploadedImage($request->file('image'), $category))) {
+                $categoryImage = $this->categoryService->updateImage($image, $category);
+
+                if (!$categoryImage) {
+                    return response()->json(["category" => $category, "message" => "Image not saved"]);
+                }
+            }
+
+            return response()->json(["category" => $category, "message" => "Category updated successfully"], 202);
+        });
     }
 
     public function destroy($id)
     {
         $category = $this->categoryService->getById($id);
-        if ($category != null) {
-            if ($this->categoryService->deleteImage($category) &&$this->categoryService->delete($category)) {
-                return response()->json(["message" => "category deleted successfully"], 202);
-            }
-        } else {
-            return response()->json(["message" => "category not found"], 404);
+        if ($category) {
+            return DB::transaction(function () use ($category) {
+                if ($this->categoryService->deleteImage($category) && $this->categoryService->delete($category)) {
+                    return response()->json(["message" => "Category deleted successfully"], 202);
+                }
+            });
         }
+
+        return response()->json(["message" => "Category not found"], 404);
     }
 }

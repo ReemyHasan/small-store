@@ -16,7 +16,7 @@ class Category extends BaseModel
         "updated_at",
     ];
     protected $with = [
-        "products"
+        "products",
     ];
     protected $appends = array("created_from", "image_url");
     public function user(){
@@ -30,5 +30,13 @@ class Category extends BaseModel
     {
         return $this->morphOne(Image::class, 'imageable');
     }
+    public function subcategories()
+    {
+        return $this->hasMany(Category::class, 'supercategory_id');
+    }
 
+    public function supercategory()
+    {
+        return $this->belongsTo(Category::class, 'supercategory_id');
+    }
 }

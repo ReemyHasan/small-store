@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,11 +19,11 @@ class ImageFactory extends Factory
      */
     public function definition(): array
     {
-        $image = fake()->image('storage/app/public/users',3840,2160, null, false);
+        $image = fake()->image('storage/app/public/products',400,300, null, false);
         return [
-            'url' => 'users/'.$image,
-            'imageable_id'=> User::factory(),
-            'imageable_type'=> get_class()
+            'url' => 'products/'.$image,
+            'imageable_id'=> Product::factory(),
+            'imageable_type'=> 'App\Models\Product'
         ];
     }
 }
