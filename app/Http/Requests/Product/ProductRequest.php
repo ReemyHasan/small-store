@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Product;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\Rule;
 
-class UpdateUserRequest extends FormRequest
+class ProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +24,14 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "email" => "email",
-            "name" => "max:25|min:5",
-            'image' => 'mimes:png,jpg,gif|max:2765|dimensions:width=3840,height=2160',
+            "name" => "required|max:25|min:5",
+            "description" => "required|max:255|min:5",
+            "status" => "required|max:3",
+            "category_id" => "required",
+            "vendor_id"=> "required",
+            "quantity"=> "integer",
+            "images"=>"required|array|min:2",
+            'images.*' => 'image|mimes:png,jpg,gif|max:2765|dimensions:width=3840,height=2160',
         ];
     }
     public function failedValidation(Validator $validator)

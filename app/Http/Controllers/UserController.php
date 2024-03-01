@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UpdateUserRequest;
-use App\Http\Requests\UserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
+use App\Http\Requests\User\UserRequest;
 use App\Services\UserService;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -27,68 +28,69 @@ class UserController extends Controller
 
     public function store(UserRequest $request)
     {
-        $validated = $request->validated();
-        $user = $this->userService->create($request->except('image', 'password_confirmation'));
-        if ($user) {
-            if ($request->hasFile('image')) {
-                if ($image = $this->userService->handleUploadedImage($request->file('image'), $user)) {
-                    $userImage = $this->userService->saveImage($image, $user);
-                    $user->image;
-                    if ($userImage)
-                        return response()->json(["user" => $user, "message" => "user added successfully"], 201);
-                    else {
-                        return response()->json(["user" => $user, "message" => "image not saved"]);
-                    }
+        $request->validated();
+        return DB::transaction(function () use ($request) {
+            $user = $this->userService->create($request->except('image', 'password_confirmation'));
+
+            if ($request->hasFile('image') && ($image = $this->userService->handleUploadedImage($request->file('image'), $user))) {
+                $userImage = $this->userService->saveImage($image, $user);
+
+                if (!$userImage) {
+                    return response()->json(["user" => $user, "message" => "image not saved"]);
                 }
             }
             return response()->json(["user" => $user, "message" => "user added successfully"], 201);
-        }
-        return response()->json(["message" => "user not saved"]);
+        });
+
+
 
     }
 
     public function show($id)
     {
         $user = $this->userService->getById($id);
-        if ($user != null) {
-            return response()->json(['user' => $user]);
-
-        } else {
+        if (!$user)
             return response()->json(["message" => "user not found"], 404);
-        }
+
+        return response()->json(['user' => $user]);
+
     }
 
     public function update(UpdateUserRequest $request, $id)
     {
         $user = $this->userService->getById($id);
-        if ($user != null) {
-            $request->validated();
-            $this->userService->update($user, $request->except('image', 'password_confirmation'));
-            if ($request->hasFile('image')) {
-                if ($image = $this->userService->handleUploadedImage($request->file('image'), $user)) {
-                    $userImage = $this->userService->updateImage($image, $user);
-                    if ($userImage)
-                        return response()->json(["user" => $user, "message" => "user updated successfully"], 202);
-                    else {
-                        return response()->json(["user" => $user, "message" => "image not saved"]);
-                    }
-                }
-            }
-            return response()->json(["message" => "user updated successfully"], 202);
-        } else {
+        if (!$user) {
             return response()->json(["message" => "user not found"], 404);
         }
+        $request->validated();
+        return DB::transaction(function () use ($request, $user) {
+            $this->userService->update($user, $request->except('image', 'password_confirmation'));
+
+
+            if ($request->hasFile('image') && ($image = $this->userService->handleUploadedImage($request->file('image'), $user))) {
+                $userImage = $this->userService->updateImage($image, $user);
+
+                if (!$userImage) {
+                    return response()->json(["user" => $user, "message" => "image not saved"]);
+                }
+            }
+
+            return response()->json(["message" => "user updated successfully"], 202);
+        });
+
     }
 
     public function destroy($id)
     {
         $user = $this->userService->getById($id);
-        if ($user != null) {
-
-            if ($this->userService->deleteImage($user) && $this->userService->delete($user))
-                return response()->json(["message" => "user deleted successfully"], 202);
-        } else {
+        if (!$user)
             return response()->json(["message" => "user not found"], 404);
-        }
+
+        return DB::transaction(function () use ($user) {
+            if ($this->userService->deleteImage($user) && $this->userService->delete($user)) {
+                return response()->json(["message" => "User deleted successfully"], 202);
+            }
+        });
+
     }
 }
