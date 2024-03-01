@@ -30,8 +30,6 @@ class Category extends BaseModel
     {
         return $this->morphOne(Image::class, 'imageable');
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
     public static function getAll()
     {
         $rootCategories = Category::with('subcategories')->where('supercategory_id', 0)->get();
@@ -55,7 +53,7 @@ class Category extends BaseModel
         }
 
         return $category;
-=======
+    }
     public function subcategories()
     {
         return $this->hasMany(Category::class, 'supercategory_id');
@@ -64,16 +62,5 @@ class Category extends BaseModel
     public function supercategory()
     {
         return $this->belongsTo(Category::class, 'supercategory_id');
->>>>>>> 4b60e833342e3553e2d990998f227c8c4682565a
-=======
-    public function subcategories()
-    {
-        return $this->hasMany(Category::class, 'supercategory_id');
-    }
-
-    public function supercategory()
-    {
-        return $this->belongsTo(Category::class, 'supercategory_id');
->>>>>>> 4b60e833342e3553e2d990998f227c8c4682565a
     }
 }

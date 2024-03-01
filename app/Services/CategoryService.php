@@ -10,15 +10,8 @@ class CategoryService
     use CommonService;
     public function getAll()
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
         $categories = Category::getAll();
-=======
-        $categories = Category::with('subcategories')->where('supercategory_id', 0)->with('subcategories')->get();
->>>>>>> 4b60e833342e3553e2d990998f227c8c4682565a
-=======
-        $categories = Category::with('subcategories')->where('supercategory_id', 0)->with('subcategories')->get();
->>>>>>> 4b60e833342e3553e2d990998f227c8c4682565a
+
         return $categories;
     }
     public function create($data)
