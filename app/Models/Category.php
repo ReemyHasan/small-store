@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\CreatedFrom;
 use App\Traits\ImageAttribute;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -30,37 +31,23 @@ class Category extends BaseModel
     {
         return $this->morphOne(Image::class, 'imageable');
     }
-    public static function getAll()
-    {
-        $rootCategories = Category::with('subcategories')->where('supercategory_id', 0)->get();
 
-        $categories = $rootCategories->map(function ($category) {
-            $category->load('subcategories');
-            $category = Category::addSubcategoriesRecursively($category);
-            return $category;
-        });
-
-        return $categories;
-    }
-
-    protected static function addSubcategoriesRecursively($category)
-    {
-        if ($category->subcategories->isNotEmpty()) {
-            $category->subcategories->transform(function ($subcategory) {
-                $subcategory = Category::addSubcategoriesRecursively($subcategory);
-                return $subcategory;
-            });
-        }
-
-        return $category;
-    }
     public function subcategories()
     {
-        return $this->hasMany(Category::class, 'supercategory_id');
+        return $this->hasMany(Category::class, 'supercategory_id')
+        ->select([
+            'id',
+            'name',
+            'supercategory_id',
+            'created_at'
+        ])->with(['subcategories', 'products.user']);;
     }
 
     public function supercategory()
     {
         return $this->belongsTo(Category::class, 'supercategory_id');
+    }
+    public function scopeParent(Builder $builder) {
+        $builder->where('supercategory_id',0);
     }
 }

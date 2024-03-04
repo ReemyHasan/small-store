@@ -10,7 +10,7 @@ class CategoryService
     use CommonService;
     public function getAll()
     {
-        $categories = Category::getAll();
+        $categories =Category::with(['subcategories', 'products.user'])->parent()->get();
 
         return $categories;
     }
