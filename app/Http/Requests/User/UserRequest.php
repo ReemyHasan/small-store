@@ -25,19 +25,19 @@ class UserRequest extends FormRequest
     {
         return [
             "email" => "required|email|unique:users|max:255",
-            "name" => "required|max:25|min:5",
+            "name" => "required|max:25|min:3",
             "password" => "required|confirmed|min:6|max:30
             |regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!@$#%]).*$/",
-            "role" => "required|max:10",
-            'image' => 'required|image|mimes:png,jpg,gif|max:2765|dimensions:width=3840,height=2160',
+            "is_admin" => "boolean",
+            'image' => 'required|image|mimes:png,jpg,gif|max:2765|dimensions:width<=3840,height<=2160',
         ];
     }
-    public function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(response()->json([
-            'success' => false,
-            'message' => 'Validation errors',
-            'data' => $validator->errors()
-        ]));
-    }
+    // public function failedValidation(Validator $validator)
+    // {
+    //     throw new HttpResponseException(response()->json([
+    //         'success' => false,
+    //         'message' => 'Validation errors',
+    //         'data' => $validator->errors()
+    //     ]));
+    // }
 }

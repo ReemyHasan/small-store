@@ -14,6 +14,8 @@ class ProductService
     }
     public function create($data)
     {
+
+        $data["vendor_id"] = Auth::user()->id;
         return Product::create($data);
     }
     public function getById($id)
@@ -30,7 +32,7 @@ class ProductService
     }
     public function handleUploadedImage($image, $product)
     {
-        return HandleUploadedImage($image,$product,'products');
+        return HandleUploadedImage($image, $product, 'products');
     }
 
     public function handleUploadedImages($images, $product)

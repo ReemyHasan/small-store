@@ -1,29 +1,26 @@
 <?php
 
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\Admin\AdminActionsController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 Route::group(['prefix' => 'v1/'], function () {
-    Route::apiResource('users', UserController::class);
-    Route::apiResource('products', ProductController::class);
-    Route::apiResource('categories', CategoryController::class);
+    Route::group(['middleware' => 'auth:sanctum'], function () {
+        Route::group(['prefix' => 'admin/', 'middleware' => 'is_admin'], function () {
+            Route::put('evaluate_product/{product}', [AdminActionsController::class, 'evaluate_product']);
+            Route::get('my_notification', [AdminActionsController::class, 'my_notification']);
+        });
+        Route::apiResource('users', UserController::class);
+        Route::apiResource('products', ProductController::class);
+        Route::apiResource('categories', CategoryController::class);
+        Route::post('logout', [AuthController::class, 'logout']);
+
+    });
+    Route::post('login', [AuthController::class, 'login']);
+
 });
 

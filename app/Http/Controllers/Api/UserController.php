@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Requests\User\UserRequest;
 use App\Services\UserService;
@@ -32,6 +33,7 @@ class UserController extends Controller
         return DB::transaction(function () use ($request) {
             $user = $this->userService->create($request->except('image', 'password_confirmation'));
 
+            $user->createToken('auth_token')->plainTextToken;
             if ($request->hasFile('image') && ($image = $this->userService->handleUploadedImage($request->file('image'), $user))) {
                 $userImage = $this->userService->saveImage($image, $user);
 

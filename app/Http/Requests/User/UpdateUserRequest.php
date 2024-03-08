@@ -26,16 +26,16 @@ class UpdateUserRequest extends FormRequest
     {
         return [
             "email" => "email",
-            "name" => "max:25|min:5",
+            "name" => "max:25|min:3",
             'image' => 'image|mimes:png,jpg,gif|max:2765|dimensions:width=3840,height=2160',
         ];
     }
-    public function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(response()->json([
-            'success' => false,
-            'message' => 'Validation errors',
-            'data' => $validator->errors()
-        ]));
-    }
+    // public function failedValidation(Validator $validator)
+    // {
+    //     throw new HttpResponseException(response()->json([
+    //         'success' => false,
+    //         'message' => 'Validation errors',
+    //         'data' => $validator->errors()
+    //     ]));
+    // }
 }

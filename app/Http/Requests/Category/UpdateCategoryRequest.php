@@ -40,13 +40,13 @@ class UpdateCategoryRequest extends FormRequest
             ],
         ];
     }
-    public function failedValidation(ResponseValidator $validator)
-    {
-        throw new HttpResponseException(response()->json([
-            'success' => false,
-            'message' => 'Validation errors',
-            'data' => $validator->errors(),
+    // public function failedValidation(ResponseValidator $validator)
+    // {
+    //     throw new HttpResponseException(response()->json([
+    //         'success' => false,
+    //         'message' => 'Validation errors',
+    //         'data' => $validator->errors(),
 
-        ]));
-    }
+    //     ]));
+    // }
 }

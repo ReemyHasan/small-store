@@ -5,6 +5,7 @@ namespace App\Http\Requests\Product;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Auth;
 
 class ProductRequest extends FormRequest
 {
@@ -28,18 +29,17 @@ class ProductRequest extends FormRequest
             "description" => "required|max:255|min:5",
             "status" => "required|max:3",
             "category_id" => "required",
-            "vendor_id"=> "required",
             "quantity"=> "integer",
             "images"=>"required|array|min:2",
-            'images.*' => 'image|mimes:png,jpg,gif|max:2765|dimensions:width=3840,height=2160',
+            'images.*' => 'image|mimes:png,jpg,gif|max:2765|dimensions:width<=3840,height<=2160',
         ];
     }
-    public function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(response()->json([
-            'success' => false,
-            'message' => 'Validation errors',
-            'data' => $validator->errors()
-        ]));
-    }
+    // public function failedValidation(Validator $validator)
+    // {
+    //     throw new HttpResponseException(response()->json([
+    //         'success' => false,
+    //         'message' => 'Validation errors',
+    //         'data' => $validator->errors()
+    //     ]));
+    // }
 }

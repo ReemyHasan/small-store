@@ -1,10 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\ProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
+use App\Jobs\NotifyAdminJob;
 use App\Services\ProductService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -30,17 +33,15 @@ class ProductController extends Controller
         $request->validated();
         return DB::transaction(function () use ($request) {
             $product = $this->productService->create($request->except('images'));
-
-            if ($request->hasFile('image') && ($images = $this->productService->handleUploadedImages($request->file('images'), $product))) {
-                $productImages = $this->productService->saveImages($images, $product);
-
-                if (!$productImages)
-                    return response()->json(["product" => $product, "message" => "image not saved"]);
-            }
+            $images = $this->productService->handleUploadedImages($request->file('images'), $product);
+            $this->productService->saveImages($images, $product);
+            ///////////////////////
+            NotifyAdminJob::dispatch(Auth::user(), $product);
+            //////////////////////
             return response()->json(
                 [
-                    "product" => $product,
-                    "message" => "product added successfully"
+                    "message" => "The product added successfully, please wait to accept it by admin.",
+                    "product" => $product
                 ],
                 201
             );

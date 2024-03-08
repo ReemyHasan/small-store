@@ -21,13 +21,14 @@ class ProductFactory extends Factory
         $users = User::pluck('id')->toArray();
         $categories = Category::pluck('id')->toArray();
         return [
-            'name' => fake()->text('15'),
-            'description'=> fake()->slug(),
+            'name' => 'product'.rand(1,10000),
+            'description'=> 'product'.rand(1,10000),
             'status'=> rand(0,1),
             'quantity'=> rand(0,300),
-            'price'=> fake()->randomFloat(1,120,130),
+            'price'=> fake()->randomFloat(1,120,100000),
             'vendor_id' => fake()->randomElement($users),
             'category_id' => fake()->randomElement($categories),
+            'is_accepted' => 1
         ];
     }
 }
