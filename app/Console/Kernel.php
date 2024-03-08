@@ -11,7 +11,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('app:delete-rejected-products')->everyMinute();
+        $schedule->command('app:delete-rejected-products')->everyMinute()->runInBackground();
     }
 
     /**

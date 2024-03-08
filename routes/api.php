@@ -12,7 +12,7 @@ Route::group(['prefix' => 'v1/'], function () {
     Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::group(['prefix' => 'admin/', 'middleware' => 'is_admin'], function () {
             Route::put('evaluate_product/{product}', [AdminActionsController::class, 'evaluate_product']);
-            Route::get('my_notification', [AdminActionsController::class, 'my_notification']);
+            // Route::get('my_notification', [AdminActionsController::class, 'my_notification']);
         });
         Route::apiResource('users', UserController::class);
         Route::apiResource('products', ProductController::class);

@@ -14,17 +14,17 @@ use Illuminate\Support\Facades\Notification;
 
 class AdminActionsController extends Controller
 {
-    public function my_notification()
-    {
-        $notification = "no new notificatios";
-        if (!empty(Auth::user()->notifications)) {
-            $notification = Auth::user()->notifications;
-            Auth::user()->unreadNotifications->markAsRead();
-        }
-        return response()->json([
-            "your notifications" => $notification
-        ]);
-    }
+    // public function my_notification()
+    // {
+    //     $notification = "no new notificatios";
+    //     if (!empty(Auth::user()->notifications)) {
+    //         $notification = Auth::user()->notifications;
+    //         Auth::user()->unreadNotifications->markAsRead();
+    //     }
+    //     return response()->json([
+    //         "your notifications" => $notification
+    //     ]);
+    // }
     public function evaluate_product(Request $request, $id)
     {
         return DB::transaction(function () use ($request, $id) {
