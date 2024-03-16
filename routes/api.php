@@ -1,26 +1,24 @@
 <?php
-
-use App\Http\Controllers\Api\Admin\AdminActionsController;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::group(['prefix' => 'v1/'], function () {
-    Route::group(['middleware' => 'auth:sanctum'], function () {
-        Route::group(['prefix' => 'admin/', 'middleware' => 'is_admin'], function () {
-            Route::put('evaluate_product/{product}', [AdminActionsController::class, 'evaluate_product']);
-            // Route::get('my_notification', [AdminActionsController::class, 'my_notification']);
-        });
-        Route::apiResource('users', UserController::class);
-        Route::apiResource('products', ProductController::class);
-        Route::apiResource('categories', CategoryController::class);
-        Route::post('logout', [AuthController::class, 'logout']);
+$dev_path = __DIR__ . '/Dashboard/';
 
+Route::prefix('v1/')->group(function () use ($dev_path) {
+
+    Route::group(['middleware' => 'auth:sanctum'], function () use ($dev_path) {
+
+        include "{$dev_path}Users.php";
+
+        include "{$dev_path}Products.php";
+
+        include "{$dev_path}Categories.php";
+
+        Route::group(['prefix' => 'admin/', 'middleware' => 'is_admin'], function () use ($dev_path) {
+            include "{$dev_path}Admin.php";
+        });
     });
-    Route::post('login', [AuthController::class, 'login']);
+
+    include "auth.php";
 
 });
-

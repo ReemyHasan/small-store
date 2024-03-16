@@ -29,8 +29,7 @@ class deleteRejectedProducts extends Command
      */
     public function handle()
     {
-        $deletedProducts = Product::where('is_accepted', 0)->withoutGlobalScopes()->get();
-        // Log::error($deletedProducts);
+        $deletedProducts = Product::where('is_accepted', 0)->withoutGlobalScopes()->with('user')->get();
         foreach ($deletedProducts as $product) {
             $user = $product->user;
             $product->delete();
