@@ -17,6 +17,7 @@ class CategoryController extends Controller
     }
     public function index()
     {
+        $this->authorize('view','App\Models\Category');
         $categories = $this->categoryService->getAll();
         if ($categories)
             return response()->json([
@@ -27,6 +28,7 @@ class CategoryController extends Controller
 
     public function store(CategoryRequest $request)
     {
+        $this->authorize('create','App\Models\Category');
         $request->validated();
         return DB::transaction(function () use ($request) {
             $category = $this->categoryService->create($request->except('image'));
@@ -45,6 +47,7 @@ class CategoryController extends Controller
 
     public function show($id)
     {
+        $this->authorize('view','App\Models\Category');
         $category = $this->categoryService->getById($id);
         if (!$category) {
             return response()->json($category);
@@ -56,6 +59,7 @@ class CategoryController extends Controller
     public function update(UpdateCategoryRequest $request, $id)
     {
         $category = $this->categoryService->getById($id);
+        $this->authorize('update',$category);
         if (!$category) {
             return response()->json(["message" => "category not found"], 404);
         }
@@ -78,6 +82,7 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         $category = $this->categoryService->getById($id);
+        $this->authorize('delete',$category);
         if ($category) {
             return DB::transaction(function () use ($category) {
                 if ($this->categoryService->deleteImage($category) && $this->categoryService->delete($category)) {

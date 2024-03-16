@@ -19,6 +19,8 @@ class ProductController extends Controller
     }
     public function index()
     {
+        $this->authorize('view','App\Models\Product');
+
         $products = $this->productService->getAll();
         if ($products)
             return response()->json([
@@ -30,6 +32,7 @@ class ProductController extends Controller
 
     public function store(ProductRequest $request)
     {
+        $this->authorize('create','App\Models\Product');
         $request->validated();
         return DB::transaction(function () use ($request) {
             $product = $this->productService->create($request->except('images'));
@@ -51,6 +54,7 @@ class ProductController extends Controller
 
     public function show($id)
     {
+        $this->authorize('view','App\Models\Product');
         $product = $this->productService->getById($id);
         if (!$product)
             return response()->json(["message" => "product not found"], 404);
@@ -62,6 +66,7 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, $id)
     {
         $product = $this->productService->getById($id);
+        $this->authorize('update',$product);
         if (!$product)
             return response()->json(["message" => "product not found"], 404);
 
@@ -89,6 +94,7 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = $this->productService->getById($id);
+        $this->authorize('delete',$product);
         if (!$product)
             return response()->json(["message" => "product not found"], 404);
         return DB::transaction(function () use ($product) {

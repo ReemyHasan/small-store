@@ -18,6 +18,7 @@ class UserController extends Controller
 
     public function index()
     {
+        $this->authorize('view','App\Models\User');
         $users = $this->userService->getAll();
         if ($users) {
             return response()->json([
@@ -29,6 +30,7 @@ class UserController extends Controller
 
     public function store(UserRequest $request)
     {
+        $this->authorize('create','App\Models\User');
         $request->validated();
         return DB::transaction(function () use ($request) {
             $user = $this->userService->create($request->except('image', 'password_confirmation'));
@@ -50,6 +52,7 @@ class UserController extends Controller
 
     public function show($id)
     {
+        $this->authorize('view','App\Models\User');
         $user = $this->userService->getById($id);
         if (!$user)
             return response()->json(["message" => "user not found"], 404);
@@ -61,6 +64,8 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, $id)
     {
         $user = $this->userService->getById($id);
+        $this->authorize('update',$user);
+
         if (!$user) {
             return response()->json(["message" => "user not found"], 404);
         }
@@ -85,6 +90,7 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = $this->userService->getById($id);
+        $this->authorize('delete',$user);
         if (!$user)
             return response()->json(["message" => "user not found"], 404);
 

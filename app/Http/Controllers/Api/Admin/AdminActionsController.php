@@ -27,6 +27,7 @@ class AdminActionsController extends Controller
     // }
     public function evaluate_product(Request $request, $id)
     {
+        $this->authorize('update','App\Models\Product');
         return DB::transaction(function () use ($request, $id) {
             $product = Product::where('id', $id)->first();
             $status = $request->get('is_accepted');
