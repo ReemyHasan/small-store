@@ -2,8 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\UserHasRole;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class UserHasRoleSeeder extends Seeder
@@ -13,13 +12,16 @@ class UserHasRoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $userRoleMappings = [
-            ['user_id' => 561, 'role_id' => 1],
-            ['user_id' => 562, 'role_id' => 2]
-        ];
+            $user1 = User::findOrFail(1);
+            $user2 = User::findOrFail(2);
+            $user3 = User::findOrFail(3);
+            $user4 = User::findOrFail(4);
 
-        foreach ($userRoleMappings as $mapping) {
-            UserHasRole::create($mapping);
-        }
+            $user1->update(['role_id'=>1]);
+            $user2->update(['role_id'=>2]);
+            $user3->update(['role_id'=>3]);
+            $user4->update(['role_id'=>4]);
+
+
     }
 }

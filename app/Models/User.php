@@ -59,9 +59,8 @@ class User extends BaseModel implements
     {
         return $this->morphOne(Image::class, 'imageable');
     }
-
-    public function roles()
+    public function role()
     {
-        return $this->belongsToMany(Role::class, 'user_has_role', 'user_id', 'role_id')->withTimestamps();
+        return $this->belongsTo(Role::class);
     }
 }
