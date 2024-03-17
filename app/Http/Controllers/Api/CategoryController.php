@@ -49,7 +49,7 @@ class CategoryController extends Controller
     {
         $this->authorize('view','App\Models\Category');
         $category = $this->categoryService->getById($id);
-        if (!$category) {
+        if ($category) {
             return response()->json($category);
         } else {
             return response()->json(["message" => "category not found"], 404);
