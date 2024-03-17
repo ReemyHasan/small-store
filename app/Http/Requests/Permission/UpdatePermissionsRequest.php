@@ -23,7 +23,8 @@ class UpdatePermissionsRequest extends FormRequest
     {
         return [
             'permissions' => 'required|array',
-            'permissions.*' => 'exists:permissions,id',
+            'permissions.*.id' => 'required|exists:permissions,id',
+            'permissions.*.allow' => 'required|boolean',
         ];
     }
 }
