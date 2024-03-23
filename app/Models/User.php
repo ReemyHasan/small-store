@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Traits\CreatedFrom;
 use App\Traits\ImageAttribute;
+use App\Utilities\FilterBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Notifications\Notifiable;
@@ -68,5 +69,15 @@ class User extends BaseModel implements
         return $this->role->permissions->contains(function ($permission) use ($permissionName) {
             return $permission->name == $permissionName && $permission->pivot->allow;
         });
+    }
+    public function products(){
+        return $this->hasMany(Product::class,'vendor_id')->filter();
+    }
+    public function scopeFilterBy($query, $filters)
+    {
+        $namespace = 'App\Utilities\UserFilters';
+        $filter = new FilterBuilder($query, $filters, $namespace);
+
+        return $filter->apply();
     }
 }

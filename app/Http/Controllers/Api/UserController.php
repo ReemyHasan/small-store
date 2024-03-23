@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Requests\User\UserRequest;
+use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +20,7 @@ class UserController extends Controller
     public function index()
     {
         $this->authorize('view','App\Models\User');
-        $users = $this->userService->getAll();
+        $users = User::filterBy(request()->all())->get();
         if ($users) {
             return response()->json([
                 "message" => "all users",

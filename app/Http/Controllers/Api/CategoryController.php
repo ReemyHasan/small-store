@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Category\CategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
+use App\Models\Category;
 use App\Services\CategoryService;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +19,8 @@ class CategoryController extends Controller
     public function index()
     {
         $this->authorize('view','App\Models\Category');
-        $categories = $this->categoryService->getAll();
+        $categories = Category::filterBy(request()->all())->get();
+
         if ($categories)
             return response()->json([
                 "message" => "all categories",

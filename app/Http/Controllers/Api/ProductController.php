@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\ProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Jobs\NotifyAdminJob;
+use App\Models\Product;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,8 +21,7 @@ class ProductController extends Controller
     public function index()
     {
         $this->authorize('view','App\Models\Product');
-
-        $products = $this->productService->getAll();
+        $products = Product::filterBy(request()->all())->get();
         if ($products)
             return response()->json([
                 "message" => "all products",

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\CreatedFrom;
 use App\Traits\ImageAttribute;
+use App\Utilities\FilterBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -49,5 +50,12 @@ class Category extends BaseModel
     }
     public function scopeParent(Builder $builder) {
         $builder->where('supercategory_id',0);
+    }
+    public function scopeFilterBy($query, $filters)
+    {
+        $namespace = 'App\Utilities\CategoryFilters';
+        $filter = new FilterBuilder($query, $filters, $namespace);
+
+        return $filter->apply();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\CreatedFrom;
+use App\Utilities\FilterBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -55,5 +56,13 @@ class Product extends BaseModel
         })->with(['user' => function ($query) {
             $query->select('id', 'name','created_at');
         }]);
+    }
+
+    public function scopeFilterBy($query, $filters)
+    {
+        $namespace = 'App\Utilities\ProductFilters';
+        $filter = new FilterBuilder($query, $filters, $namespace);
+
+        return $filter->apply();
     }
 }
