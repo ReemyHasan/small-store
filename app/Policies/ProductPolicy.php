@@ -10,29 +10,21 @@ class ProductPolicy
 {
     public function view(User $user)
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'Product Read' && $permission->pivot->allow;
-        });
+        return $user->hasPermission('Product Read');
     }
 
     public function create(User $user)
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'Product Create' && $permission->pivot->allow;
-        });
+        return $user->hasPermission('Product Create');
     }
 
     public function update(User $user, Product $product)
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'Product Update' && $permission->pivot->allow;
-        });
+        return (($user->hasPermission('Product Update') && $product->user->id == $user->id) || $user->role->name== 'Owner' );
     }
 
     public function delete(User $user, Product $product)
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'Product Delete' && $permission->pivot->allow;
-        });
+        return (($user->hasPermission('Product Delete') && $product->user->id == $user->id) || $user->role->name== 'Owner');
     }
 }

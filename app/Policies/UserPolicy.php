@@ -10,9 +10,7 @@ class UserPolicy
 
     public function view(User $user): bool
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'User Read' && $permission->pivot->allow;
-        });
+        return $user->hasPermission('User Read');
     }
 
     /**
@@ -20,9 +18,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'User Create' && $permission->pivot->allow;
-        });
+        return $user->hasPermission('User Create');
     }
 
     /**
@@ -30,9 +26,8 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'User Update' && $permission->pivot->allow;
-        });
+        return $user->hasPermission('User Update');
+
     }
 
     /**
@@ -40,8 +35,6 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'User Delete' && $permission->pivot->allow;
-        });
+        return $user->hasPermission('User Delete');
     }
 }

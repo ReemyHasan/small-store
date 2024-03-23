@@ -63,4 +63,10 @@ class User extends BaseModel implements
     {
         return $this->belongsTo(Role::class);
     }
+    public function hasPermission($permissionName)
+    {
+        return $this->role->permissions->contains(function ($permission) use ($permissionName) {
+            return $permission->name == $permissionName && $permission->pivot->allow;
+        });
+    }
 }

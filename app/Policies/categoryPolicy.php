@@ -10,29 +10,21 @@ class categoryPolicy
 {
     public function view(User $user)
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'Category Read' && $permission->pivot->allow;
-        });
+        return $user->hasPermission('Category Read');
     }
 
     public function create(User $user)
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'Category Create' && $permission->pivot->allow;
-        });
+        return $user->hasPermission('Category Create');
     }
 
     public function update(User $user, Category $category)
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'Category Update' && $permission->pivot->allow;
-        });
+        return (($user->hasPermission('Category Update')&& $category->user->id == $user->id) || $user->role->name== 'Owner');
     }
 
     public function delete(User $user, Category $category)
     {
-        return $user->role->permissions->contains(function ($permission) {
-            return $permission->name == 'Category Delete' && $permission->pivot->allow;
-        });
+        return (($user->hasPermission('Category Delete') && $category->user->id == $user->id) || $user->role->name== 'Owner');
     }
 }
